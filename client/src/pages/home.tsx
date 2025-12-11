@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,9 @@ import {
   Grid3X3, 
   ArrowRight,
   Ruler,
-  Info
+  Info,
+  DollarSign,
+  Download
 } from "lucide-react";
 import blueprintBg from "@assets/generated_images/subtle_architectural_grid_background.png";
 import { motion } from "framer-motion";
@@ -27,6 +29,30 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+interface CalculationResults {
+  perimeter: number;
+  wallArea: number;
+  floorArea: number;
+  studs: number;
+  plates: number;
+  drywallSheets: number;
+  flooringSqFt: number;
+  paintGallons: number;
+  insulationRolls: number;
+  insulationBatts: number;
+}
+
+type MaterialPrice = {
+  studs: number;
+  plates: number;
+  drywallSheets: number;
+  insulationRolls: number;
+  insulationBatts: number;
+  flooringSqFt: number;
+  paintGallons: number;
+  primerGallons: number;
+};
 
 function HomeCalculatorIcon({ className }: { className?: string }) {
   return (
@@ -48,18 +74,17 @@ function HomeCalculatorIcon({ className }: { className?: string }) {
 }
 
 export default function Home() {
-  const [results, setResults] = useState<{
-    perimeter: number;
-    wallArea: number;
-    floorArea: number;
-    studs: number;
-    plates: number;
-    drywallSheets: number;
-    flooringSqFt: number;
-    paintGallons: number;
-    insulationRolls: number;
-    insulationBatts: number;
-  } | null>(null);
+  const [results, setResults] = useState<CalculationResults | null>(null);
+  const [prices, setPrices] = useState<MaterialPrice>({
+    studs: 0,
+    plates: 0,
+    drywallSheets: 0,
+    insulationRolls: 0,
+    insulationBatts: 0,
+    flooringSqFt: 0,
+    paintGallons: 0,
+    primerGallons: 0,
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -75,32 +100,13 @@ export default function Home() {
     const wallArea = perimeter * values.height;
     const floorArea = values.length * values.width;
 
-    // Framing: 16" OC spacing (1.33 ft) + 10% waste/corners/openings
-    // Rule of thumb: 1 stud per linear foot covers spacing + corners + headers roughly
-    const studCount = Math.ceil(perimeter) + 4; // Simple rule: 1 per foot + 4 corners
-
-    // Plates: 3 rows (2 top, 1 bottom) using 10ft boards usually, or just linear footage
-    // Let's output linear feet of plate material needed
+    const studCount = Math.ceil(perimeter) + 4;
     const plateLinearFeet = perimeter * 3;
-    const plateCount = Math.ceil(plateLinearFeet / 10); // Assuming 10ft lumber for plates
-
-    // Drywall: 4x8 sheets (32 sq ft). Add 10% waste.
+    const plateCount = Math.ceil(plateLinearFeet / 10);
     const drywallSheets = Math.ceil((wallArea / 32) * 1.1);
-
-    // Flooring: Area + 10% waste
     const flooringSqFt = Math.ceil(floorArea * 1.1);
-
-    // Paint: 350 sq ft per gallon (1 coat). Usually need 2 coats + primer.
-    // Let's assume 2 coats of paint.
     const paintGallons = Math.ceil((wallArea / 350) * 2);
-
-    // Insulation: 15" wide rolls for 16" OC bays.
-    // Each stud bay is ~14.5" wide.
-    // Total bays approx = perimeter / 1.33.
-    // Easier calc: Wall Area - (Stud Area). Roughly just Wall Area sq ft.
-    // Rolls usually cover ~40-50 sq ft (R13 Kraft Faced 15" x 32').
     const insulationRolls = Math.ceil(wallArea / 40);
-    // Batts usually sold in bags covering ~40-50 sq ft as well
     const insulationBatts = Math.ceil(wallArea / 40);
 
     setResults({
@@ -116,6 +122,58 @@ export default function Home() {
       insulationBatts
     });
   }
+
+  const updatePrice = (key: keyof MaterialPrice, value: string) => {
+    const numValue = parseFloat(value) || 0;
+    setPrices(prev => ({ ...prev, [key]: numValue }));
+  };
+
+  const totalCost = useMemo(() => {
+    if (!results) return 0;
+    return (
+      (results.studs * prices.studs) +
+      (results.plates * prices.plates) +
+      (results.drywallSheets * prices.drywallSheets) +
+      // User likely chooses one insulation type, but let's sum based on inputs > 0? 
+      // Or just sum everything assuming they fill out what they use. 
+      // If both are priced, it adds both. User should only price one.
+      (results.insulationRolls * prices.insulationRolls) +
+      (results.insulationBatts * prices.insulationBatts) +
+      (results.flooringSqFt * prices.flooringSqFt) +
+      (results.paintGallons * prices.paintGallons) +
+      (Math.ceil(results.paintGallons / 2) * prices.primerGallons)
+    );
+  }, [results, prices]);
+
+  const downloadCSV = () => {
+    if (!results) return;
+
+    const primerGallons = Math.ceil(results.paintGallons / 2);
+
+    const data = [
+      ["Material", "Quantity", "Unit", "Unit Price", "Total Cost"],
+      ["2x4 Studs (8ft)", results.studs, "pcs", prices.studs, results.studs * prices.studs],
+      ["2x4 Plates (10ft)", results.plates, "pcs", prices.plates, results.plates * prices.plates],
+      ["4x8 Drywall Sheets", results.drywallSheets, "sheets", prices.drywallSheets, results.drywallSheets * prices.drywallSheets],
+      ["Insulation (Rolls)", results.insulationRolls, "rolls", prices.insulationRolls, results.insulationRolls * prices.insulationRolls],
+      ["Insulation (Batts)", results.insulationBatts, "bags", prices.insulationBatts, results.insulationBatts * prices.insulationBatts],
+      ["Flooring", results.flooringSqFt, "sq ft", prices.flooringSqFt, results.flooringSqFt * prices.flooringSqFt],
+      ["Paint (2 coats)", results.paintGallons, "gallons", prices.paintGallons, results.paintGallons * prices.paintGallons],
+      ["Primer", primerGallons, "gallons", prices.primerGallons, primerGallons * prices.primerGallons],
+      ["", "", "", "TOTAL ESTIMATE", totalCost]
+    ];
+
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + data.map(e => e.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "renovation_estimate.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="min-h-screen bg-background font-sans text-foreground relative overflow-hidden">
@@ -264,9 +322,13 @@ export default function Home() {
                   </div>
                 </div>
 
-                <Separator className="my-6" />
-                
-                <h2 className="text-2xl font-bold tracking-tight mb-6">Material Requirements</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold tracking-tight">Material Requirements & Cost</h2>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+                    <DollarSign className="h-4 w-4" />
+                    <span>Enter unit prices to calculate total</span>
+                  </div>
+                </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   {/* Framing */}
@@ -275,9 +337,21 @@ export default function Home() {
                     title="Framing Lumber"
                     color="text-orange-500"
                     items={[
-                      { label: "2x4 Studs (8ft)", value: results.studs, unit: "pcs" },
-                      { label: "2x4 Plates (10ft)", value: results.plates, unit: "pcs" },
+                      { 
+                        label: "2x4 Studs (8ft)", 
+                        value: results.studs, 
+                        unit: "pcs", 
+                        priceKey: "studs" 
+                      },
+                      { 
+                        label: "2x4 Plates (10ft)", 
+                        value: results.plates, 
+                        unit: "pcs", 
+                        priceKey: "plates" 
+                      },
                     ]}
+                    prices={prices}
+                    onPriceChange={updatePrice}
                   />
 
                   {/* Drywall */}
@@ -286,10 +360,12 @@ export default function Home() {
                     title="Drywall & Insulation"
                     color="text-blue-500"
                     items={[
-                      { label: "4x8 Drywall Sheets", value: results.drywallSheets, unit: "sheets" },
-                      { label: "R13 Insulation Rolls", value: results.insulationRolls, unit: "rolls" },
-                      { label: "R13 Insulation Batts", value: results.insulationBatts, unit: "bags" },
+                      { label: "4x8 Drywall Sheets", value: results.drywallSheets, unit: "sheets", priceKey: "drywallSheets" },
+                      { label: "R13 Insulation Rolls", value: results.insulationRolls, unit: "rolls", priceKey: "insulationRolls" },
+                      { label: "R13 Insulation Batts", value: results.insulationBatts, unit: "bags", priceKey: "insulationBatts" },
                     ]}
+                    prices={prices}
+                    onPriceChange={updatePrice}
                   />
 
                   {/* Flooring */}
@@ -298,9 +374,10 @@ export default function Home() {
                     title="Flooring"
                     color="text-emerald-500"
                     items={[
-                      { label: "Total Coverage", value: results.flooringSqFt, unit: "sq ft" },
-                      { label: "Base Floor Area", value: results.floorArea, unit: "sq ft" },
+                      { label: "Total Coverage", value: results.flooringSqFt, unit: "sq ft", priceKey: "flooringSqFt" },
                     ]}
+                    prices={prices}
+                    onPriceChange={updatePrice}
                   />
 
                   {/* Paint */}
@@ -309,11 +386,45 @@ export default function Home() {
                     title="Finishing"
                     color="text-purple-500"
                     items={[
-                      { label: "Wall Paint (2 coats)", value: results.paintGallons, unit: "gallons" },
-                      { label: "Primer (1 coat)", value: Math.ceil(results.paintGallons / 2), unit: "gallons" },
+                      { label: "Wall Paint (2 coats)", value: results.paintGallons, unit: "gallons", priceKey: "paintGallons" },
+                      { label: "Primer (1 coat)", value: Math.ceil(results.paintGallons / 2), unit: "gallons", priceKey: "primerGallons" },
                     ]}
+                    prices={prices}
+                    onPriceChange={updatePrice}
                   />
                 </div>
+
+                {/* Total Cost Section */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-primary/5 border border-primary/20 rounded-lg p-6 mt-8"
+                >
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-lg font-bold flex items-center gap-2">
+                        <DollarSign className="h-5 w-5 text-primary" />
+                        Estimated Project Cost
+                      </h3>
+                      <p className="text-sm text-muted-foreground">Based on provided unit prices</p>
+                    </div>
+                    <div className="text-4xl font-mono font-bold text-primary">
+                      ${totalCost.toFixed(2)}
+                    </div>
+                  </div>
+                  
+                  <Separator className="my-4 bg-primary/10" />
+                  
+                  <Button 
+                    onClick={downloadCSV} 
+                    className="w-full sm:w-auto flex items-center gap-2" 
+                    variant="outline"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download CSV Estimate
+                  </Button>
+                </motion.div>
+
               </motion.div>
             ) : (
               <div className="h-full min-h-[400px] flex flex-col items-center justify-center text-center p-12 border-2 border-dashed rounded-lg bg-muted/20">
@@ -333,11 +444,13 @@ export default function Home() {
   );
 }
 
-function MaterialCard({ icon: Icon, title, color, items }: { 
+function MaterialCard({ icon: Icon, title, color, items, prices, onPriceChange }: { 
   icon: any, 
   title: string, 
   color: string, 
-  items: { label: string, value: number, unit: string }[] 
+  items: { label: string, value: number, unit: string, priceKey: keyof MaterialPrice }[],
+  prices: MaterialPrice,
+  onPriceChange: (key: keyof MaterialPrice, value: string) => void
 }) {
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md border-l-4" style={{ borderLeftColor: 'currentColor' }}>
@@ -350,11 +463,30 @@ function MaterialCard({ icon: Icon, title, color, items }: {
       <CardContent className="pt-4">
         <div className="space-y-4">
           {items.map((item, i) => (
-            <div key={i} className="flex justify-between items-center border-b border-dashed last:border-0 pb-2 last:pb-0">
-              <span className="text-sm text-muted-foreground">{item.label}</span>
-              <span className="font-mono font-bold text-lg">
-                {item.value} <span className="text-xs font-normal text-muted-foreground">{item.unit}</span>
-              </span>
+            <div key={i} className="space-y-2 border-b border-dashed last:border-0 pb-3 last:pb-0">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground font-medium">{item.label}</span>
+                <span className="font-mono font-bold text-lg">
+                  {item.value} <span className="text-xs font-normal text-muted-foreground">{item.unit}</span>
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                  <Input 
+                    type="number" 
+                    placeholder="0.00" 
+                    className="h-8 pl-5 text-xs font-mono bg-background/50"
+                    min="0"
+                    step="0.01"
+                    value={prices[item.priceKey] || ''}
+                    onChange={(e) => onPriceChange(item.priceKey, e.target.value)}
+                  />
+                </div>
+                <div className="text-xs font-mono text-muted-foreground w-16 text-right">
+                  ${((prices[item.priceKey] || 0) * item.value).toFixed(2)}
+                </div>
+              </div>
             </div>
           ))}
         </div>

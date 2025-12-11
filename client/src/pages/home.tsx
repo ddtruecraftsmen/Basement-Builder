@@ -277,32 +277,24 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background font-sans text-foreground relative overflow-hidden flex flex-col">
-      {/* Background Pattern */}
-      <div 
-        className="absolute inset-0 opacity-40 pointer-events-none z-0 mix-blend-multiply"
-        style={{
-          backgroundImage: `url(${blueprintBg})`,
-          backgroundSize: '400px',
-          backgroundRepeat: 'repeat'
-        }}
-      />
+      {/* Background Pattern - Removed for cleaner look */}
+      <div className="absolute inset-0 bg-background z-0" />
       
       {/* Header */}
-      <header className="relative z-10 border-b bg-card/80 backdrop-blur-sm sticky top-0 no-print">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary p-2">
+      <header className="relative z-10 border-b bg-card shadow-sm sticky top-0 no-print">
+        <div className="container mx-auto px-4 py-6 flex items-center justify-between">
+          <div className="flex flex-col items-center mx-auto sm:mx-0 sm:items-start sm:flex-row sm:gap-4">
+            <div className="bg-primary p-2 rounded-md mb-2 sm:mb-0">
               <HomeCalculatorIcon className="h-6 w-6 text-primary-foreground" />
             </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight uppercase">RenoCalc <span className="text-primary">Pro</span></h1>
-              <p className="text-xs text-muted-foreground font-mono tracking-wider">RENOVATION MATERIAL ESTIMATOR</p>
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl font-bold tracking-tight text-primary">RenoCalc Pro</h1>
+              <p className="text-xs text-muted-foreground tracking-wider uppercase">Basement Renovation Material Estimator</p>
             </div>
           </div>
-          <Button variant="outline" size="sm" className="hidden sm:flex font-mono text-xs gap-2">
-            <Info className="h-3 w-3" />
-            V1.0.0
-          </Button>
+          <div className="hidden sm:block text-right">
+             <div className="text-xs text-muted-foreground font-mono">V1.0.0</div>
+          </div>
         </div>
       </header>
 
@@ -316,10 +308,10 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <Card className="border-2 shadow-lg">
-                <CardHeader className="bg-muted/50 border-b pb-4">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Ruler className="h-5 w-5 text-primary" />
+              <Card className="border shadow-md">
+                <CardHeader className="bg-muted/30 border-b pb-4">
+                  <CardTitle className="flex items-center gap-2 text-lg text-primary">
+                    <Ruler className="h-5 w-5" />
                     Room Dimensions
                   </CardTitle>
                   <CardDescription>Enter the finished measurements of your basement room.</CardDescription>
@@ -333,9 +325,9 @@ export default function Home() {
                           name="length"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="font-mono text-xs uppercase text-muted-foreground">Length (ft)</FormLabel>
+                              <FormLabel className="text-sm font-bold text-foreground">Length (ft)</FormLabel>
                               <FormControl>
-                                <Input type="number" {...field} className="font-mono text-lg bg-background" />
+                                <Input type="number" {...field} className="text-lg bg-background" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -346,9 +338,9 @@ export default function Home() {
                           name="width"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="font-mono text-xs uppercase text-muted-foreground">Width (ft)</FormLabel>
+                              <FormLabel className="text-sm font-bold text-foreground">Width (ft)</FormLabel>
                               <FormControl>
-                                <Input type="number" {...field} className="font-mono text-lg bg-background" />
+                                <Input type="number" {...field} className="text-lg bg-background" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -362,9 +354,9 @@ export default function Home() {
                           name="height"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="font-mono text-xs uppercase text-muted-foreground">Ceiling Height (ft)</FormLabel>
+                              <FormLabel className="text-sm font-bold text-foreground">Height (ft)</FormLabel>
                               <FormControl>
-                                <Input type="number" step="0.5" {...field} className="font-mono text-lg bg-background" />
+                                <Input type="number" step="0.5" {...field} className="text-lg bg-background" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -376,10 +368,10 @@ export default function Home() {
                           name="waste"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="font-mono text-xs uppercase text-muted-foreground">Waste Factor (%)</FormLabel>
+                              <FormLabel className="text-sm font-bold text-foreground">Waste Factor (%)</FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <Input type="number" {...field} className="font-mono text-lg bg-background pr-8" />
+                                  <Input type="number" {...field} className="text-lg bg-background pr-8" />
                                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>
                                 </div>
                               </FormControl>
@@ -389,14 +381,14 @@ export default function Home() {
                         />
                       </div>
 
-                      <Button type="submit" size="lg" className="w-full font-bold uppercase tracking-wide text-md h-12" disabled={isCalculating}>
+                      <Button type="submit" size="lg" className="w-full font-bold text-md h-12 shadow-sm hover:shadow-md transition-all" disabled={isCalculating}>
                         {isCalculating ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Calculating...
                           </>
                         ) : (
                           <>
-                            Calculate Materials <ArrowRight className="ml-2 h-4 w-4" />
+                            Calculate Materials
                           </>
                         )}
                       </Button>
@@ -460,7 +452,7 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold tracking-tight">Material Requirements & Cost</h2>
+                  <h2 className="text-2xl font-bold tracking-tight text-primary">Material Requirements & Cost</h2>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full no-print">
                     <DollarSign className="h-4 w-4" />
                     <span>Enter unit prices to calculate total</span>
@@ -472,7 +464,7 @@ export default function Home() {
                   <MaterialCard 
                     icon={Hammer}
                     title="Framing Lumber"
-                    color="text-orange-500"
+                    color="text-primary"
                     items={[
                       { 
                         label: "2x4 Studs (8ft)", 
@@ -497,7 +489,7 @@ export default function Home() {
                   <MaterialCard 
                     icon={Layers}
                     title="Drywall & Insulation"
-                    color="text-blue-500"
+                    color="text-primary"
                     items={[
                       { label: "Wall Drywall (4x8)", value: results.wallDrywallSheets, unit: "sheets", priceKey: "wallDrywallSheets" },
                       { label: "Ceiling Drywall (4x8)", value: results.ceilingDrywallSheets, unit: "sheets", priceKey: "ceilingDrywallSheets" },
@@ -514,7 +506,7 @@ export default function Home() {
                   <MaterialCard 
                     icon={Grid3X3}
                     title="Flooring"
-                    color="text-emerald-500"
+                    color="text-primary"
                     items={[
                       { label: "Total Coverage", value: results.flooringSqFt, unit: "sq ft", priceKey: "flooringSqFt" },
                     ]}
@@ -528,7 +520,7 @@ export default function Home() {
                   <MaterialCard 
                     icon={PaintBucket}
                     title="Finishing"
-                    color="text-purple-500"
+                    color="text-primary"
                     items={[
                       { label: "Baseboard Trim", value: results.baseboardFeet, unit: "ft", priceKey: "baseboardFeet" },
                       { label: "Wall Paint (2 coats)", value: results.paintGallons, unit: "gallons", priceKey: "paintGallons" },
@@ -624,10 +616,10 @@ function MaterialCard({ icon: Icon, title, color, items, prices, onPriceChange, 
   onToggle: (key: keyof MaterialPrice) => void
 }) {
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-md border-l-4" style={{ borderLeftColor: 'currentColor' }}>
+    <Card className="overflow-hidden transition-all hover:shadow-md border-l-4" style={{ borderLeftColor: 'var(--primary)' }}>
       <CardHeader className="bg-muted/30 pb-3">
-        <CardTitle className="flex items-center gap-2 text-md">
-          <Icon className={`h-5 w-5 ${color}`} />
+        <CardTitle className="flex items-center gap-2 text-md text-primary">
+          <Icon className={`h-5 w-5`} />
           {title}
         </CardTitle>
       </CardHeader>
@@ -641,15 +633,16 @@ function MaterialCard({ icon: Icon, title, color, items, prices, onPriceChange, 
                     id={`check-${item.priceKey}`}
                     checked={enabledItems[item.priceKey]}
                     onCheckedChange={() => onToggle(item.priceKey)}
+                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                   />
                   <label 
                     htmlFor={`check-${item.priceKey}`}
-                    className="text-sm text-muted-foreground font-medium cursor-pointer select-none"
+                    className="text-sm text-foreground font-bold cursor-pointer select-none"
                   >
                     {item.label}
                   </label>
                 </div>
-                <span className="font-mono font-bold text-lg">
+                <span className="font-mono font-bold text-lg text-primary">
                   {item.value} <span className="text-xs font-normal text-muted-foreground">{item.unit}</span>
                 </span>
               </div>
@@ -659,7 +652,7 @@ function MaterialCard({ icon: Icon, title, color, items, prices, onPriceChange, 
                   <Input 
                     type="number" 
                     placeholder="0.00" 
-                    className="h-8 pl-5 text-xs font-mono bg-background/50"
+                    className="h-8 pl-5 text-xs font-mono bg-white"
                     min="0"
                     step="0.01"
                     value={prices[item.priceKey] || ''}
@@ -667,7 +660,7 @@ function MaterialCard({ icon: Icon, title, color, items, prices, onPriceChange, 
                     disabled={!enabledItems[item.priceKey]}
                   />
                 </div>
-                <div className="text-xs font-mono text-muted-foreground w-16 text-right">
+                <div className="text-xs font-mono text-muted-foreground w-16 text-right font-bold">
                   {enabledItems[item.priceKey] ? `$${((prices[item.priceKey] || 0) * item.value).toFixed(2)}` : '$0.00'}
                 </div>
               </div>

@@ -149,8 +149,11 @@ export default function Home() {
       const floorArea = values.length * values.width;
 
       // Framing: 16" OC spacing (1.33 ft) + corners. 
+      // Note: Using perimeter for studs, not area. 
+      // Waste factor for studs is usually lower (cuts are reusable), so we use half the general waste factor.
       const baseStuds = (perimeter / 1.333) + 4;
-      const studCount = Math.ceil(baseStuds * wasteFactor);
+      const studWasteFactor = 1 + ((values.waste / 100) / 2);
+      const studCount = Math.ceil(baseStuds * studWasteFactor);
 
       // Plates: 3 rows (2 top, 1 bottom)
       const plateLinearFeet = perimeter * 3;
@@ -164,7 +167,9 @@ export default function Home() {
       const flooringSqFt = Math.ceil(floorArea * wasteFactor);
 
       // Paint: 350 sq ft per gallon (1 coat). 
-      const paintGallons = Math.ceil((wallArea / 350) * 2); // 2 coats. 
+      // Paint waste is low, using 1/4 of general waste factor
+      const paintWasteFactor = 1 + ((values.waste / 100) / 4);
+      const paintGallons = Math.ceil((wallArea / 350) * 2 * paintWasteFactor); // 2 coats + small waste 
 
       // Insulation
       const insulationRolls = Math.ceil((wallArea / 40) * wasteFactor);

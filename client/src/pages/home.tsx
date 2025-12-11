@@ -40,7 +40,7 @@ interface CalculationResults {
   studs: number;
   plates: number;
   drywallSheets: number;
-  flooringSheets: number;
+  flooringSqFt: number;
   paintGallons: number;
   insulationRolls: number;
   insulationBatts: number;
@@ -52,7 +52,7 @@ type MaterialPrice = {
   drywallSheets: number;
   insulationRolls: number;
   insulationBatts: number;
-  flooringSheets: number;
+  flooringSqFt: number;
   paintGallons: number;
   primerGallons: number;
 };
@@ -85,7 +85,7 @@ export default function Home() {
     drywallSheets: 13.00,
     insulationRolls: 25.00, // Est R13 Roll
     insulationBatts: 55.00, // Est R13 Bag
-    flooringSheets: 25.00, // 4x8 Plywood/OSB
+    flooringSqFt: 3.50, // Mid-range laminate/vinyl per sq ft
     paintGallons: 45.00,
     primerGallons: 30.00,
   });
@@ -123,8 +123,8 @@ export default function Home() {
       // Drywall: 4x8 sheets (32 sq ft)
       const drywallSheets = Math.ceil((wallArea / 32) * wasteFactor);
 
-      // Flooring: 4x8 Sheets (32 sq ft) - Plywood/OSB
-      const flooringSheets = Math.ceil((floorArea / 32) * wasteFactor);
+      // Flooring: Sq Ft + waste
+      const flooringSqFt = Math.ceil(floorArea * wasteFactor);
 
       // Paint: 350 sq ft per gallon (1 coat). 
       const paintGallons = Math.ceil((wallArea / 350) * 2); // 2 coats. 
@@ -140,7 +140,7 @@ export default function Home() {
         studs: studCount,
         plates: plateCount,
         drywallSheets,
-        flooringSheets,
+        flooringSqFt,
         paintGallons,
         insulationRolls,
         insulationBatts
@@ -162,7 +162,7 @@ export default function Home() {
       (results.drywallSheets * prices.drywallSheets) +
       (results.insulationRolls * prices.insulationRolls) +
       (results.insulationBatts * prices.insulationBatts) +
-      (results.flooringSheets * prices.flooringSheets) +
+      (results.flooringSqFt * prices.flooringSqFt) +
       (results.paintGallons * prices.paintGallons) +
       (Math.ceil(results.paintGallons / 2) * prices.primerGallons)
     );
@@ -201,7 +201,7 @@ export default function Home() {
       ["4x8 Drywall Sheets", results.drywallSheets, "sheets", prices.drywallSheets, results.drywallSheets * prices.drywallSheets],
       ["Insulation (Rolls)", results.insulationRolls, "rolls", prices.insulationRolls, results.insulationRolls * prices.insulationRolls],
       ["Insulation (Batts)", results.insulationBatts, "bags", prices.insulationBatts, results.insulationBatts * prices.insulationBatts],
-      ["4x8 Plywood/OSB", results.flooringSheets, "sheets", prices.flooringSheets, results.flooringSheets * prices.flooringSheets],
+      ["Flooring", results.flooringSqFt, "sq ft", prices.flooringSqFt, results.flooringSqFt * prices.flooringSqFt],
       ["Paint (2 coats)", results.paintGallons, "gallons", prices.paintGallons, results.paintGallons * prices.paintGallons],
       ["Primer", primerGallons, "gallons", prices.primerGallons, primerGallons * prices.primerGallons],
       ["", "", "", "TOTAL ESTIMATE", totalCost]
@@ -455,7 +455,7 @@ export default function Home() {
                     title="Flooring"
                     color="text-emerald-500"
                     items={[
-                      { label: "4x8 Plywood/OSB", value: results.flooringSheets, unit: "sheets", priceKey: "flooringSheets" },
+                      { label: "Total Coverage", value: results.flooringSqFt, unit: "sq ft", priceKey: "flooringSqFt" },
                     ]}
                     prices={prices}
                     onPriceChange={updatePrice}

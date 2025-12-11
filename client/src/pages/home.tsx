@@ -44,6 +44,7 @@ interface CalculationResults {
   paintGallons: number;
   insulationRolls: number;
   insulationBatts: number;
+  baseboardFeet: number;
 }
 
 type MaterialPrice = {
@@ -53,6 +54,7 @@ type MaterialPrice = {
   insulationRolls: number;
   insulationBatts: number;
   flooringSqFt: number;
+  baseboardFeet: number;
   paintGallons: number;
   primerGallons: number;
 };
@@ -86,6 +88,7 @@ export default function Home() {
     insulationRolls: 25.00, // Est R13 Roll
     insulationBatts: 55.00, // Est R13 Bag
     flooringSqFt: 3.50, // Mid-range laminate/vinyl per sq ft
+    baseboardFeet: 1.50, // Primed MDF/Pine per ft
     paintGallons: 45.00,
     primerGallons: 30.00,
   });
@@ -133,6 +136,9 @@ export default function Home() {
       const insulationRolls = Math.ceil((wallArea / 40) * wasteFactor);
       const insulationBatts = Math.ceil((wallArea / 40) * wasteFactor);
 
+      // Baseboard: Perimeter + waste
+      const baseboardFeet = Math.ceil(perimeter * wasteFactor);
+
       setResults({
         perimeter,
         wallArea,
@@ -143,7 +149,8 @@ export default function Home() {
         flooringSqFt,
         paintGallons,
         insulationRolls,
-        insulationBatts
+        insulationBatts,
+        baseboardFeet
       });
       setIsCalculating(false);
     }, 600);
@@ -163,6 +170,7 @@ export default function Home() {
       (results.insulationRolls * prices.insulationRolls) +
       (results.insulationBatts * prices.insulationBatts) +
       (results.flooringSqFt * prices.flooringSqFt) +
+      (results.baseboardFeet * prices.baseboardFeet) +
       (results.paintGallons * prices.paintGallons) +
       (Math.ceil(results.paintGallons / 2) * prices.primerGallons)
     );
@@ -202,6 +210,7 @@ export default function Home() {
       ["Insulation (Rolls)", results.insulationRolls, "rolls", prices.insulationRolls, results.insulationRolls * prices.insulationRolls],
       ["Insulation (Batts)", results.insulationBatts, "bags", prices.insulationBatts, results.insulationBatts * prices.insulationBatts],
       ["Flooring", results.flooringSqFt, "sq ft", prices.flooringSqFt, results.flooringSqFt * prices.flooringSqFt],
+      ["Baseboard", results.baseboardFeet, "ft", prices.baseboardFeet, results.baseboardFeet * prices.baseboardFeet],
       ["Paint (2 coats)", results.paintGallons, "gallons", prices.paintGallons, results.paintGallons * prices.paintGallons],
       ["Primer", primerGallons, "gallons", prices.primerGallons, primerGallons * prices.primerGallons],
       ["", "", "", "TOTAL ESTIMATE", totalCost]
@@ -461,12 +470,13 @@ export default function Home() {
                     onPriceChange={updatePrice}
                   />
 
-                  {/* Paint */}
+                  {/* Paint & Finish */}
                   <MaterialCard 
                     icon={PaintBucket}
                     title="Finishing"
                     color="text-purple-500"
                     items={[
+                      { label: "Baseboard Trim", value: results.baseboardFeet, unit: "ft", priceKey: "baseboardFeet" },
                       { label: "Wall Paint (2 coats)", value: results.paintGallons, unit: "gallons", priceKey: "paintGallons" },
                       { label: "Primer (1 coat)", value: Math.ceil(results.paintGallons / 2), unit: "gallons", priceKey: "primerGallons" },
                     ]}

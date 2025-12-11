@@ -279,6 +279,7 @@ export default function Home() {
                         />
                       </div>
                       
+                      <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
                           name="height"

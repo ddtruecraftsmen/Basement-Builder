@@ -114,7 +114,7 @@ export default function Home() {
               <Calculator className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight uppercase">BaseCalc <span className="text-primary">Pro</span></h1>
+              <h1 className="text-xl font-bold tracking-tight uppercase">RenoCalc <span className="text-primary">Pro</span></h1>
               <p className="text-xs text-muted-foreground font-mono tracking-wider">RENOVATION MATERIAL ESTIMATOR</p>
             </div>
           </div>

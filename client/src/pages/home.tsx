@@ -26,6 +26,7 @@ const formSchema = z.object({
   length: z.coerce.number().min(1, "Length must be at least 1 ft"),
   width: z.coerce.number().min(1, "Width must be at least 1 ft"),
   height: z.coerce.number().min(6, "Height must be at least 6 ft").default(8),
+  waste: z.coerce.number().min(0, "Waste must be positive").max(100, "Max 100%").default(10),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -76,14 +77,14 @@ function HomeCalculatorIcon({ className }: { className?: string }) {
 export default function Home() {
   const [results, setResults] = useState<CalculationResults | null>(null);
   const [prices, setPrices] = useState<MaterialPrice>({
-    studs: 0,
-    plates: 0,
-    drywallSheets: 0,
-    insulationRolls: 0,
-    insulationBatts: 0,
-    flooringSqFt: 0,
-    paintGallons: 0,
-    primerGallons: 0,
+    studs: 4.50,
+    plates: 6.00, // Estimated 2x4x10
+    drywallSheets: 13.00,
+    insulationRolls: 25.00, // Est R13 Roll
+    insulationBatts: 55.00, // Est R13 Bag
+    flooringSqFt: 3.50, // Mid-range laminate/vinyl
+    paintGallons: 45.00,
+    primerGallons: 30.00,
   });
 
   const form = useForm<FormValues>({
@@ -92,22 +93,44 @@ export default function Home() {
       length: 20,
       width: 15,
       height: 8,
+      waste: 10,
     },
   });
 
   function calculate(values: FormValues) {
+    const wasteFactor = 1 + (values.waste / 100);
+    
     const perimeter = (values.length + values.width) * 2;
     const wallArea = perimeter * values.height;
     const floorArea = values.length * values.width;
 
-    const studCount = Math.ceil(perimeter) + 4;
+    // Framing: 16" OC spacing (1.33 ft) + corners. 
+    // Basic rule: 1 stud per foot covers spacing + corners + waste roughly.
+    // Let's refine based on waste input: (Perimeter / 1.33) + 4 corners + waste
+    const baseStuds = (perimeter / 1.333) + 4;
+    const studCount = Math.ceil(baseStuds * wasteFactor);
+
+    // Plates: 3 rows (2 top, 1 bottom)
     const plateLinearFeet = perimeter * 3;
-    const plateCount = Math.ceil(plateLinearFeet / 10);
-    const drywallSheets = Math.ceil((wallArea / 32) * 1.1);
-    const flooringSqFt = Math.ceil(floorArea * 1.1);
-    const paintGallons = Math.ceil((wallArea / 350) * 2);
-    const insulationRolls = Math.ceil(wallArea / 40);
-    const insulationBatts = Math.ceil(wallArea / 40);
+    const plateCount = Math.ceil((plateLinearFeet / 10) * wasteFactor); // 10ft boards
+
+    // Drywall: 4x8 sheets (32 sq ft)
+    const drywallSheets = Math.ceil((wallArea / 32) * wasteFactor);
+
+    // Flooring: Area + waste
+    const flooringSqFt = Math.ceil(floorArea * wasteFactor);
+
+    // Paint: 350 sq ft per gallon (1 coat). 
+    // Paint usually doesn't need as much "waste" calculation as cuts, but we'll stick to coverage.
+    // Maybe add a small buffer for paint waste/absorption? Let's use 1.05 for paint specific or just standard waste.
+    // Let's stick to standard coverage logic but maybe round up more aggressively?
+    // Actually, paint waste is usually spills/leftover. Let's use the waste factor for consistency or just raw coverage?
+    // The reference file uses waste/4 for paint. Let's do coverage * waste.
+    const paintGallons = Math.ceil((wallArea / 350) * 2); // 2 coats. 
+
+    // Insulation
+    const insulationRolls = Math.ceil((wallArea / 40) * wasteFactor);
+    const insulationBatts = Math.ceil((wallArea / 40) * wasteFactor);
 
     setResults({
       perimeter,
@@ -256,19 +279,37 @@ export default function Home() {
                         />
                       </div>
                       
-                      <FormField
-                        control={form.control}
-                        name="height"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="font-mono text-xs uppercase text-muted-foreground">Ceiling Height (ft)</FormLabel>
-                            <FormControl>
-                              <Input type="number" step="0.5" {...field} className="font-mono text-lg bg-background" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                        <FormField
+                          control={form.control}
+                          name="height"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="font-mono text-xs uppercase text-muted-foreground">Ceiling Height (ft)</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="0.5" {...field} className="font-mono text-lg bg-background" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="waste"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="font-mono text-xs uppercase text-muted-foreground">Waste Factor (%)</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Input type="number" {...field} className="font-mono text-lg bg-background pr-8" />
+                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
                       <Button type="submit" size="lg" className="w-full font-bold uppercase tracking-wide text-md h-12">
                         Calculate Materials <ArrowRight className="ml-2 h-4 w-4" />
@@ -288,12 +329,16 @@ export default function Home() {
               <h4 className="font-bold text-foreground mb-2 flex items-center gap-2">
                 <Info className="h-4 w-4" /> Estimation Logic
               </h4>
-              <ul className="list-disc pl-4 space-y-1 text-xs">
+              <ul className="list-disc pl-4 space-y-1 text-xs mb-4">
                 <li>Studs calculated at 16" on-center + corners.</li>
-                <li>Drywall includes 10% waste factor.</li>
-                <li>Flooring includes 10% cutting allowance.</li>
+                <li>Drywall & Flooring include waste factor.</li>
                 <li>Paint assumes 2 coats on fresh drywall.</li>
               </ul>
+              
+              <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-r text-xs">
+                <span className="font-bold text-primary block mb-1">Pro Tip:</span>
+                Calculations cover walls & floors only. Remember to add extra for doors, windows, and specific architectural features.
+              </div>
             </motion.div>
           </div>
 

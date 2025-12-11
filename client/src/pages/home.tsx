@@ -28,6 +28,28 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+function HomeCalculatorIcon({ className }: { className?: string }) {
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className={className}
+    >
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <rect x="8" y="13" width="8" height="6" rx="1" />
+      <path d="M10 15h.01" />
+      <path d="M14 15h.01" />
+      <path d="M10 17h.01" />
+      <path d="M14 17h.01" />
+    </svg>
+  )
+}
+
 export default function Home() {
   const [results, setResults] = useState<{
     perimeter: number;
@@ -115,7 +137,7 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-primary p-2">
-              <Calculator className="h-6 w-6 text-primary-foreground" />
+              <HomeCalculatorIcon className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight uppercase">RenoCalc <span className="text-primary">Pro</span></h1>

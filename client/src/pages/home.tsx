@@ -409,7 +409,7 @@ export default function Home() {
               
               <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-r text-xs">
                 <span className="font-bold text-primary block mb-1">Pro Tip:</span>
-                This covers walls & floors only—add 10-15% extra for doors/windows/cuts. Built by D&D True Craftsmen (15+ years in basements).
+                This covers walls & floors only—add 10-15% extra for doors/windows/cuts. Built by <a href="https://www.ddtruecraftsmen.com" target="_blank" rel="noopener noreferrer" className="font-semibold underline decoration-primary/50 hover:decoration-primary transition-colors">D&D True Craftsmen</a> (15+ years in basements).
               </div>
             </motion.div>
           </div>
@@ -584,7 +584,7 @@ export default function Home() {
       </main>
       
       <footer className="relative z-10 border-t bg-card/50 py-6 text-center text-sm text-muted-foreground">
-        <p>Built by pros for pros. Questions? Hit us up at <span className="font-semibold text-foreground">D&D True Craftsmen</span>.</p>
+        <p>Built by pros for pros. Questions? Hit us up at <a href="https://www.ddtruecraftsmen.com" target="_blank" rel="noopener noreferrer" className="font-semibold text-foreground hover:underline hover:text-primary transition-colors">D&D True Craftsmen</a>.</p>
       </footer>
     </div>
   );

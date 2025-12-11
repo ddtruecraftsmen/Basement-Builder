@@ -24,6 +24,8 @@ import {
 import blueprintBg from "@assets/generated_images/subtle_architectural_grid_background.png";
 import { motion } from "framer-motion";
 
+import { Checkbox } from "@/components/ui/checkbox";
+
 const formSchema = z.object({
   length: z.coerce.number().min(1, "Length must be at least 1 ft"),
   width: z.coerce.number().min(1, "Width must be at least 1 ft"),
@@ -81,6 +83,17 @@ function HomeCalculatorIcon({ className }: { className?: string }) {
 export default function Home() {
   const [results, setResults] = useState<CalculationResults | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [enabledItems, setEnabledItems] = useState<Record<keyof MaterialPrice, boolean>>({
+    studs: true,
+    plates: true,
+    drywallSheets: true,
+    insulationRolls: true,
+    insulationBatts: true,
+    flooringSqFt: true,
+    baseboardFeet: true,
+    paintGallons: true,
+    primerGallons: true,
+  });
   const [prices, setPrices] = useState<MaterialPrice>({
     studs: 4.50,
     plates: 6.00, // Estimated 2x4x10
@@ -106,6 +119,20 @@ export default function Home() {
   function calculate(values: FormValues) {
     setIsCalculating(true);
     setResults(null);
+    // Reset enabled items to true on new calculation? Or keep user preference?
+    // Let's keep preference if keys match, but maybe safer to reset to ensure they see everything first.
+    // Actually, let's reset to true so they don't miss new items.
+    setEnabledItems({
+      studs: true,
+      plates: true,
+      drywallSheets: true,
+      insulationRolls: true,
+      insulationBatts: true,
+      flooringSqFt: true,
+      baseboardFeet: true,
+      paintGallons: true,
+      primerGallons: true,
+    });
 
     // Simulate "crunching numbers" delay for polish
     setTimeout(() => {
@@ -161,20 +188,26 @@ export default function Home() {
     setPrices(prev => ({ ...prev, [key]: numValue }));
   };
 
+  const toggleItem = (key: keyof MaterialPrice) => {
+    setEnabledItems(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const totalCost = useMemo(() => {
     if (!results) return 0;
-    return (
-      (results.studs * prices.studs) +
-      (results.plates * prices.plates) +
-      (results.drywallSheets * prices.drywallSheets) +
-      (results.insulationRolls * prices.insulationRolls) +
-      (results.insulationBatts * prices.insulationBatts) +
-      (results.flooringSqFt * prices.flooringSqFt) +
-      (results.baseboardFeet * prices.baseboardFeet) +
-      (results.paintGallons * prices.paintGallons) +
-      (Math.ceil(results.paintGallons / 2) * prices.primerGallons)
-    );
-  }, [results, prices]);
+    let total = 0;
+    
+    if (enabledItems.studs) total += results.studs * prices.studs;
+    if (enabledItems.plates) total += results.plates * prices.plates;
+    if (enabledItems.drywallSheets) total += results.drywallSheets * prices.drywallSheets;
+    if (enabledItems.insulationRolls) total += results.insulationRolls * prices.insulationRolls;
+    if (enabledItems.insulationBatts) total += results.insulationBatts * prices.insulationBatts;
+    if (enabledItems.flooringSqFt) total += results.flooringSqFt * prices.flooringSqFt;
+    if (enabledItems.baseboardFeet) total += results.baseboardFeet * prices.baseboardFeet;
+    if (enabledItems.paintGallons) total += results.paintGallons * prices.paintGallons;
+    if (enabledItems.primerGallons) total += Math.ceil(results.paintGallons / 2) * prices.primerGallons;
+
+    return total;
+  }, [results, prices, enabledItems]);
 
   const shareResults = async () => {
     if (!results) return;
@@ -203,17 +236,17 @@ export default function Home() {
     const primerGallons = Math.ceil(results.paintGallons / 2);
 
     const data = [
-      ["Material", "Quantity", "Unit", "Unit Price", "Total Cost"],
-      ["2x4 Studs (8ft)", results.studs, "pcs", prices.studs, results.studs * prices.studs],
-      ["2x4 Plates (10ft)", results.plates, "pcs", prices.plates, results.plates * prices.plates],
-      ["4x8 Drywall Sheets", results.drywallSheets, "sheets", prices.drywallSheets, results.drywallSheets * prices.drywallSheets],
-      ["Insulation (Rolls)", results.insulationRolls, "rolls", prices.insulationRolls, results.insulationRolls * prices.insulationRolls],
-      ["Insulation (Batts)", results.insulationBatts, "bags", prices.insulationBatts, results.insulationBatts * prices.insulationBatts],
-      ["Flooring", results.flooringSqFt, "sq ft", prices.flooringSqFt, results.flooringSqFt * prices.flooringSqFt],
-      ["Baseboard", results.baseboardFeet, "ft", prices.baseboardFeet, results.baseboardFeet * prices.baseboardFeet],
-      ["Paint (2 coats)", results.paintGallons, "gallons", prices.paintGallons, results.paintGallons * prices.paintGallons],
-      ["Primer", primerGallons, "gallons", prices.primerGallons, primerGallons * prices.primerGallons],
-      ["", "", "", "TOTAL ESTIMATE", totalCost]
+      ["Material", "Quantity", "Unit", "Unit Price", "Total Cost", "Included"],
+      ["2x4 Studs (8ft)", results.studs, "pcs", prices.studs, results.studs * prices.studs, enabledItems.studs ? "Yes" : "No"],
+      ["2x4 Plates (10ft)", results.plates, "pcs", prices.plates, results.plates * prices.plates, enabledItems.plates ? "Yes" : "No"],
+      ["4x8 Drywall Sheets", results.drywallSheets, "sheets", prices.drywallSheets, results.drywallSheets * prices.drywallSheets, enabledItems.drywallSheets ? "Yes" : "No"],
+      ["Insulation (Rolls)", results.insulationRolls, "rolls", prices.insulationRolls, results.insulationRolls * prices.insulationRolls, enabledItems.insulationRolls ? "Yes" : "No"],
+      ["Insulation (Batts)", results.insulationBatts, "bags", prices.insulationBatts, results.insulationBatts * prices.insulationBatts, enabledItems.insulationBatts ? "Yes" : "No"],
+      ["Flooring", results.flooringSqFt, "sq ft", prices.flooringSqFt, results.flooringSqFt * prices.flooringSqFt, enabledItems.flooringSqFt ? "Yes" : "No"],
+      ["Baseboard", results.baseboardFeet, "ft", prices.baseboardFeet, results.baseboardFeet * prices.baseboardFeet, enabledItems.baseboardFeet ? "Yes" : "No"],
+      ["Paint (2 coats)", results.paintGallons, "gallons", prices.paintGallons, results.paintGallons * prices.paintGallons, enabledItems.paintGallons ? "Yes" : "No"],
+      ["Primer", primerGallons, "gallons", prices.primerGallons, primerGallons * prices.primerGallons, enabledItems.primerGallons ? "Yes" : "No"],
+      ["", "", "", "TOTAL ESTIMATE", totalCost, ""]
     ];
 
     const csvContent = "data:text/csv;charset=utf-8," 
@@ -442,6 +475,8 @@ export default function Home() {
                     ]}
                     prices={prices}
                     onPriceChange={updatePrice}
+                    enabledItems={enabledItems}
+                    onToggle={toggleItem}
                   />
 
                   {/* Drywall */}
@@ -456,6 +491,8 @@ export default function Home() {
                     ]}
                     prices={prices}
                     onPriceChange={updatePrice}
+                    enabledItems={enabledItems}
+                    onToggle={toggleItem}
                   />
 
                   {/* Flooring */}
@@ -468,6 +505,8 @@ export default function Home() {
                     ]}
                     prices={prices}
                     onPriceChange={updatePrice}
+                    enabledItems={enabledItems}
+                    onToggle={toggleItem}
                   />
 
                   {/* Paint & Finish */}
@@ -482,6 +521,8 @@ export default function Home() {
                     ]}
                     prices={prices}
                     onPriceChange={updatePrice}
+                    enabledItems={enabledItems}
+                    onToggle={toggleItem}
                   />
                 </div>
 
@@ -549,13 +590,15 @@ export default function Home() {
   );
 }
 
-function MaterialCard({ icon: Icon, title, color, items, prices, onPriceChange }: { 
+function MaterialCard({ icon: Icon, title, color, items, prices, onPriceChange, enabledItems, onToggle }: { 
   icon: any, 
   title: string, 
   color: string, 
   items: { label: string, value: number, unit: string, priceKey: keyof MaterialPrice }[],
   prices: MaterialPrice,
-  onPriceChange: (key: keyof MaterialPrice, value: string) => void
+  onPriceChange: (key: keyof MaterialPrice, value: string) => void,
+  enabledItems: Record<keyof MaterialPrice, boolean>,
+  onToggle: (key: keyof MaterialPrice) => void
 }) {
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md border-l-4" style={{ borderLeftColor: 'currentColor' }}>
@@ -568,14 +611,26 @@ function MaterialCard({ icon: Icon, title, color, items, prices, onPriceChange }
       <CardContent className="pt-4">
         <div className="space-y-4">
           {items.map((item, i) => (
-            <div key={i} className="space-y-2 border-b border-dashed last:border-0 pb-3 last:pb-0">
+            <div key={i} className={`space-y-2 border-b border-dashed last:border-0 pb-3 last:pb-0 transition-opacity ${!enabledItems[item.priceKey] ? 'opacity-50 grayscale' : ''}`}>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground font-medium">{item.label}</span>
+                <div className="flex items-center gap-2">
+                  <Checkbox 
+                    id={`check-${item.priceKey}`}
+                    checked={enabledItems[item.priceKey]}
+                    onCheckedChange={() => onToggle(item.priceKey)}
+                  />
+                  <label 
+                    htmlFor={`check-${item.priceKey}`}
+                    className="text-sm text-muted-foreground font-medium cursor-pointer select-none"
+                  >
+                    {item.label}
+                  </label>
+                </div>
                 <span className="font-mono font-bold text-lg">
                   {item.value} <span className="text-xs font-normal text-muted-foreground">{item.unit}</span>
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 pl-6">
                 <div className="relative flex-1">
                   <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
                   <Input 
@@ -586,10 +641,11 @@ function MaterialCard({ icon: Icon, title, color, items, prices, onPriceChange }
                     step="0.01"
                     value={prices[item.priceKey] || ''}
                     onChange={(e) => onPriceChange(item.priceKey, e.target.value)}
+                    disabled={!enabledItems[item.priceKey]}
                   />
                 </div>
                 <div className="text-xs font-mono text-muted-foreground w-16 text-right">
-                  ${((prices[item.priceKey] || 0) * item.value).toFixed(2)}
+                  {enabledItems[item.priceKey] ? `$${((prices[item.priceKey] || 0) * item.value).toFixed(2)}` : '$0.00'}
                 </div>
               </div>
             </div>

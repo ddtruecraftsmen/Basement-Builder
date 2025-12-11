@@ -41,7 +41,8 @@ interface CalculationResults {
   floorArea: number;
   studs: number;
   plates: number;
-  drywallSheets: number;
+  wallDrywallSheets: number;
+  ceilingDrywallSheets: number;
   flooringSqFt: number;
   paintGallons: number;
   insulationRolls: number;
@@ -52,7 +53,8 @@ interface CalculationResults {
 type MaterialPrice = {
   studs: number;
   plates: number;
-  drywallSheets: number;
+  wallDrywallSheets: number;
+  ceilingDrywallSheets: number;
   insulationRolls: number;
   insulationBatts: number;
   flooringSqFt: number;
@@ -86,7 +88,8 @@ export default function Home() {
   const [enabledItems, setEnabledItems] = useState<Record<keyof MaterialPrice, boolean>>({
     studs: true,
     plates: true,
-    drywallSheets: true,
+    wallDrywallSheets: true,
+    ceilingDrywallSheets: true,
     insulationRolls: true,
     insulationBatts: true,
     flooringSqFt: true,
@@ -97,7 +100,8 @@ export default function Home() {
   const [prices, setPrices] = useState<MaterialPrice>({
     studs: 4.50,
     plates: 6.00, // Estimated 2x4x10
-    drywallSheets: 13.00,
+    wallDrywallSheets: 13.00,
+    ceilingDrywallSheets: 13.00,
     insulationRolls: 25.00, // Est R13 Roll
     insulationBatts: 55.00, // Est R13 Bag
     flooringSqFt: 3.50, // Mid-range laminate/vinyl per sq ft
@@ -125,7 +129,8 @@ export default function Home() {
     setEnabledItems({
       studs: true,
       plates: true,
-      drywallSheets: true,
+      wallDrywallSheets: true,
+      ceilingDrywallSheets: true,
       insulationRolls: true,
       insulationBatts: true,
       flooringSqFt: true,
@@ -151,7 +156,8 @@ export default function Home() {
       const plateCount = Math.ceil((plateLinearFeet / 10) * wasteFactor); // 10ft boards
 
       // Drywall: 4x8 sheets (32 sq ft)
-      const drywallSheets = Math.ceil((wallArea / 32) * wasteFactor);
+      const wallDrywallSheets = Math.ceil((wallArea / 32) * wasteFactor);
+      const ceilingDrywallSheets = Math.ceil((floorArea / 32) * wasteFactor);
 
       // Flooring: Sq Ft + waste
       const flooringSqFt = Math.ceil(floorArea * wasteFactor);
@@ -172,7 +178,8 @@ export default function Home() {
         floorArea,
         studs: studCount,
         plates: plateCount,
-        drywallSheets,
+        wallDrywallSheets,
+        ceilingDrywallSheets,
         flooringSqFt,
         paintGallons,
         insulationRolls,
@@ -198,7 +205,8 @@ export default function Home() {
     
     if (enabledItems.studs) total += results.studs * prices.studs;
     if (enabledItems.plates) total += results.plates * prices.plates;
-    if (enabledItems.drywallSheets) total += results.drywallSheets * prices.drywallSheets;
+    if (enabledItems.wallDrywallSheets) total += results.wallDrywallSheets * prices.wallDrywallSheets;
+    if (enabledItems.ceilingDrywallSheets) total += results.ceilingDrywallSheets * prices.ceilingDrywallSheets;
     if (enabledItems.insulationRolls) total += results.insulationRolls * prices.insulationRolls;
     if (enabledItems.insulationBatts) total += results.insulationBatts * prices.insulationBatts;
     if (enabledItems.flooringSqFt) total += results.flooringSqFt * prices.flooringSqFt;
@@ -239,7 +247,8 @@ export default function Home() {
       ["Material", "Quantity", "Unit", "Unit Price", "Total Cost", "Included"],
       ["2x4 Studs (8ft)", results.studs, "pcs", prices.studs, results.studs * prices.studs, enabledItems.studs ? "Yes" : "No"],
       ["2x4 Plates (10ft)", results.plates, "pcs", prices.plates, results.plates * prices.plates, enabledItems.plates ? "Yes" : "No"],
-      ["4x8 Drywall Sheets", results.drywallSheets, "sheets", prices.drywallSheets, results.drywallSheets * prices.drywallSheets, enabledItems.drywallSheets ? "Yes" : "No"],
+      ["4x8 Drywall Sheets (Walls)", results.wallDrywallSheets, "sheets", prices.wallDrywallSheets, results.wallDrywallSheets * prices.wallDrywallSheets, enabledItems.wallDrywallSheets ? "Yes" : "No"],
+      ["4x8 Drywall Sheets (Ceiling)", results.ceilingDrywallSheets, "sheets", prices.ceilingDrywallSheets, results.ceilingDrywallSheets * prices.ceilingDrywallSheets, enabledItems.ceilingDrywallSheets ? "Yes" : "No"],
       ["Insulation (Rolls)", results.insulationRolls, "rolls", prices.insulationRolls, results.insulationRolls * prices.insulationRolls, enabledItems.insulationRolls ? "Yes" : "No"],
       ["Insulation (Batts)", results.insulationBatts, "bags", prices.insulationBatts, results.insulationBatts * prices.insulationBatts, enabledItems.insulationBatts ? "Yes" : "No"],
       ["Flooring", results.flooringSqFt, "sq ft", prices.flooringSqFt, results.flooringSqFt * prices.flooringSqFt, enabledItems.flooringSqFt ? "Yes" : "No"],
@@ -485,7 +494,8 @@ export default function Home() {
                     title="Drywall & Insulation"
                     color="text-blue-500"
                     items={[
-                      { label: "4x8 Drywall Sheets", value: results.drywallSheets, unit: "sheets", priceKey: "drywallSheets" },
+                      { label: "Wall Drywall (4x8)", value: results.wallDrywallSheets, unit: "sheets", priceKey: "wallDrywallSheets" },
+                      { label: "Ceiling Drywall (4x8)", value: results.ceilingDrywallSheets, unit: "sheets", priceKey: "ceilingDrywallSheets" },
                       { label: "R13 Insulation Rolls", value: results.insulationRolls, unit: "rolls", priceKey: "insulationRolls" },
                       { label: "R13 Insulation Batts", value: results.insulationBatts, unit: "bags", priceKey: "insulationBatts" },
                     ]}

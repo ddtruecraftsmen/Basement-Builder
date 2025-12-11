@@ -17,7 +17,9 @@ import {
   Ruler,
   Info,
   DollarSign,
-  Download
+  Download,
+  Share2,
+  Loader2
 } from "lucide-react";
 import blueprintBg from "@assets/generated_images/subtle_architectural_grid_background.png";
 import { motion } from "framer-motion";
@@ -38,7 +40,7 @@ interface CalculationResults {
   studs: number;
   plates: number;
   drywallSheets: number;
-  flooringSqFt: number;
+  flooringSheets: number;
   paintGallons: number;
   insulationRolls: number;
   insulationBatts: number;
@@ -50,7 +52,7 @@ type MaterialPrice = {
   drywallSheets: number;
   insulationRolls: number;
   insulationBatts: number;
-  flooringSqFt: number;
+  flooringSheets: number;
   paintGallons: number;
   primerGallons: number;
 };
@@ -76,13 +78,14 @@ function HomeCalculatorIcon({ className }: { className?: string }) {
 
 export default function Home() {
   const [results, setResults] = useState<CalculationResults | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
   const [prices, setPrices] = useState<MaterialPrice>({
     studs: 4.50,
     plates: 6.00, // Estimated 2x4x10
     drywallSheets: 13.00,
     insulationRolls: 25.00, // Est R13 Roll
     insulationBatts: 55.00, // Est R13 Bag
-    flooringSqFt: 3.50, // Mid-range laminate/vinyl
+    flooringSheets: 25.00, // 4x8 Plywood/OSB
     paintGallons: 45.00,
     primerGallons: 30.00,
   });
@@ -98,52 +101,52 @@ export default function Home() {
   });
 
   function calculate(values: FormValues) {
-    const wasteFactor = 1 + (values.waste / 100);
-    
-    const perimeter = (values.length + values.width) * 2;
-    const wallArea = perimeter * values.height;
-    const floorArea = values.length * values.width;
+    setIsCalculating(true);
+    setResults(null);
 
-    // Framing: 16" OC spacing (1.33 ft) + corners. 
-    // Basic rule: 1 stud per foot covers spacing + corners + waste roughly.
-    // Let's refine based on waste input: (Perimeter / 1.33) + 4 corners + waste
-    const baseStuds = (perimeter / 1.333) + 4;
-    const studCount = Math.ceil(baseStuds * wasteFactor);
+    // Simulate "crunching numbers" delay for polish
+    setTimeout(() => {
+      const wasteFactor = 1 + (values.waste / 100);
+      
+      const perimeter = (values.length + values.width) * 2;
+      const wallArea = perimeter * values.height;
+      const floorArea = values.length * values.width;
 
-    // Plates: 3 rows (2 top, 1 bottom)
-    const plateLinearFeet = perimeter * 3;
-    const plateCount = Math.ceil((plateLinearFeet / 10) * wasteFactor); // 10ft boards
+      // Framing: 16" OC spacing (1.33 ft) + corners. 
+      const baseStuds = (perimeter / 1.333) + 4;
+      const studCount = Math.ceil(baseStuds * wasteFactor);
 
-    // Drywall: 4x8 sheets (32 sq ft)
-    const drywallSheets = Math.ceil((wallArea / 32) * wasteFactor);
+      // Plates: 3 rows (2 top, 1 bottom)
+      const plateLinearFeet = perimeter * 3;
+      const plateCount = Math.ceil((plateLinearFeet / 10) * wasteFactor); // 10ft boards
 
-    // Flooring: Area + waste
-    const flooringSqFt = Math.ceil(floorArea * wasteFactor);
+      // Drywall: 4x8 sheets (32 sq ft)
+      const drywallSheets = Math.ceil((wallArea / 32) * wasteFactor);
 
-    // Paint: 350 sq ft per gallon (1 coat). 
-    // Paint usually doesn't need as much "waste" calculation as cuts, but we'll stick to coverage.
-    // Maybe add a small buffer for paint waste/absorption? Let's use 1.05 for paint specific or just standard waste.
-    // Let's stick to standard coverage logic but maybe round up more aggressively?
-    // Actually, paint waste is usually spills/leftover. Let's use the waste factor for consistency or just raw coverage?
-    // The reference file uses waste/4 for paint. Let's do coverage * waste.
-    const paintGallons = Math.ceil((wallArea / 350) * 2); // 2 coats. 
+      // Flooring: 4x8 Sheets (32 sq ft) - Plywood/OSB
+      const flooringSheets = Math.ceil((floorArea / 32) * wasteFactor);
 
-    // Insulation
-    const insulationRolls = Math.ceil((wallArea / 40) * wasteFactor);
-    const insulationBatts = Math.ceil((wallArea / 40) * wasteFactor);
+      // Paint: 350 sq ft per gallon (1 coat). 
+      const paintGallons = Math.ceil((wallArea / 350) * 2); // 2 coats. 
 
-    setResults({
-      perimeter,
-      wallArea,
-      floorArea,
-      studs: studCount,
-      plates: plateCount,
-      drywallSheets,
-      flooringSqFt,
-      paintGallons,
-      insulationRolls,
-      insulationBatts
-    });
+      // Insulation
+      const insulationRolls = Math.ceil((wallArea / 40) * wasteFactor);
+      const insulationBatts = Math.ceil((wallArea / 40) * wasteFactor);
+
+      setResults({
+        perimeter,
+        wallArea,
+        floorArea,
+        studs: studCount,
+        plates: plateCount,
+        drywallSheets,
+        flooringSheets,
+        paintGallons,
+        insulationRolls,
+        insulationBatts
+      });
+      setIsCalculating(false);
+    }, 600);
   }
 
   const updatePrice = (key: keyof MaterialPrice, value: string) => {
@@ -157,16 +160,34 @@ export default function Home() {
       (results.studs * prices.studs) +
       (results.plates * prices.plates) +
       (results.drywallSheets * prices.drywallSheets) +
-      // User likely chooses one insulation type, but let's sum based on inputs > 0? 
-      // Or just sum everything assuming they fill out what they use. 
-      // If both are priced, it adds both. User should only price one.
       (results.insulationRolls * prices.insulationRolls) +
       (results.insulationBatts * prices.insulationBatts) +
-      (results.flooringSqFt * prices.flooringSqFt) +
+      (results.flooringSheets * prices.flooringSheets) +
       (results.paintGallons * prices.paintGallons) +
       (Math.ceil(results.paintGallons / 2) * prices.primerGallons)
     );
   }, [results, prices]);
+
+  const shareResults = async () => {
+    if (!results) return;
+    
+    const text = `Check out my basement reno calc: ${results.studs} studs, $${totalCost.toFixed(2)} est. total for a ${form.getValues().length}x${form.getValues().width} room! Built by D&D True Craftsmen.`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'RenoCalc Pro Results',
+          text: text,
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.error('Share failed:', err);
+      }
+    } else {
+      navigator.clipboard.writeText(text + ' ' + window.location.href)
+        .then(() => alert('Copied to clipboard!'));
+    }
+  };
 
   const downloadCSV = () => {
     if (!results) return;
@@ -180,7 +201,7 @@ export default function Home() {
       ["4x8 Drywall Sheets", results.drywallSheets, "sheets", prices.drywallSheets, results.drywallSheets * prices.drywallSheets],
       ["Insulation (Rolls)", results.insulationRolls, "rolls", prices.insulationRolls, results.insulationRolls * prices.insulationRolls],
       ["Insulation (Batts)", results.insulationBatts, "bags", prices.insulationBatts, results.insulationBatts * prices.insulationBatts],
-      ["Flooring", results.flooringSqFt, "sq ft", prices.flooringSqFt, results.flooringSqFt * prices.flooringSqFt],
+      ["4x8 Plywood/OSB", results.flooringSheets, "sheets", prices.flooringSheets, results.flooringSheets * prices.flooringSheets],
       ["Paint (2 coats)", results.paintGallons, "gallons", prices.paintGallons, results.paintGallons * prices.paintGallons],
       ["Primer", primerGallons, "gallons", prices.primerGallons, primerGallons * prices.primerGallons],
       ["", "", "", "TOTAL ESTIMATE", totalCost]
@@ -199,7 +220,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground relative overflow-hidden">
+    <div className="min-h-screen bg-background font-sans text-foreground relative overflow-hidden flex flex-col">
       {/* Background Pattern */}
       <div 
         className="absolute inset-0 opacity-40 pointer-events-none z-0 mix-blend-multiply"
@@ -229,7 +250,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="relative z-10 container mx-auto px-4 py-8 md:py-12">
+      <main className="relative z-10 container mx-auto px-4 py-8 md:py-12 flex-grow">
         <div className="grid lg:grid-cols-12 gap-8 items-start">
           
           {/* Input Section */}
@@ -312,8 +333,16 @@ export default function Home() {
                         />
                       </div>
 
-                      <Button type="submit" size="lg" className="w-full font-bold uppercase tracking-wide text-md h-12">
-                        Calculate Materials <ArrowRight className="ml-2 h-4 w-4" />
+                      <Button type="submit" size="lg" className="w-full font-bold uppercase tracking-wide text-md h-12" disabled={isCalculating}>
+                        {isCalculating ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Calculating...
+                          </>
+                        ) : (
+                          <>
+                            Calculate Materials <ArrowRight className="ml-2 h-4 w-4" />
+                          </>
+                        )}
                       </Button>
                     </form>
                   </Form>
@@ -338,14 +367,20 @@ export default function Home() {
               
               <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-r text-xs">
                 <span className="font-bold text-primary block mb-1">Pro Tip:</span>
-                Calculations cover walls & floors only. Remember to add extra for doors, windows, and specific architectural features.
+                This covers walls & floors only—add 10-15% extra for doors/windows/cuts. Built by D&D True Craftsmen (15+ years in basements).
               </div>
             </motion.div>
           </div>
 
           {/* Results Section */}
           <div className="lg:col-span-8">
-            {results ? (
+            {isCalculating ? (
+               <div className="h-full min-h-[400px] flex flex-col items-center justify-center text-center p-12">
+                 <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
+                 <h3 className="text-xl font-bold">Crunching numbers...</h3>
+                 <p className="text-muted-foreground">Generating your material list</p>
+               </div>
+            ) : results ? (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -420,7 +455,7 @@ export default function Home() {
                     title="Flooring"
                     color="text-emerald-500"
                     items={[
-                      { label: "Total Coverage", value: results.flooringSqFt, unit: "sq ft", priceKey: "flooringSqFt" },
+                      { label: "4x8 Plywood/OSB", value: results.flooringSheets, unit: "sheets", priceKey: "flooringSheets" },
                     ]}
                     prices={prices}
                     onPriceChange={updatePrice}
@@ -461,14 +496,24 @@ export default function Home() {
                   
                   <Separator className="my-4 bg-primary/10" />
                   
-                  <Button 
-                    onClick={downloadCSV} 
-                    className="w-full sm:w-auto flex items-center gap-2" 
-                    variant="outline"
-                  >
-                    <Download className="h-4 w-4" />
-                    Download CSV Estimate
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button 
+                      onClick={downloadCSV} 
+                      className="flex-1 flex items-center gap-2" 
+                      variant="outline"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download CSV Estimate
+                    </Button>
+                    <Button 
+                      onClick={shareResults} 
+                      className="flex-1 flex items-center gap-2" 
+                      variant="outline"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      Share List
+                    </Button>
+                  </div>
                 </motion.div>
 
               </motion.div>
@@ -486,6 +531,10 @@ export default function Home() {
           </div>
         </div>
       </main>
+      
+      <footer className="relative z-10 border-t bg-card/50 py-6 text-center text-sm text-muted-foreground">
+        <p>Built by pros for pros. Questions? Hit us up at <span className="font-semibold text-foreground">D&D True Craftsmen</span>.</p>
+      </footer>
     </div>
   );
 }

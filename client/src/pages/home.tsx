@@ -19,7 +19,8 @@ import {
   DollarSign,
   Download,
   Share2,
-  Loader2
+  Loader2,
+  Printer
 } from "lucide-react";
 import blueprintBg from "@assets/generated_images/subtle_architectural_grid_background.png";
 import { motion } from "framer-motion";
@@ -217,6 +218,10 @@ export default function Home() {
     return total;
   }, [results, prices, enabledItems]);
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   const shareResults = async () => {
     if (!results) return;
     
@@ -283,7 +288,7 @@ export default function Home() {
       />
       
       {/* Header */}
-      <header className="relative z-10 border-b bg-card/80 backdrop-blur-sm sticky top-0">
+      <header className="relative z-10 border-b bg-card/80 backdrop-blur-sm sticky top-0 no-print">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-primary p-2">
@@ -305,7 +310,7 @@ export default function Home() {
         <div className="grid lg:grid-cols-12 gap-8 items-start">
           
           {/* Input Section */}
-          <div className="lg:col-span-4 space-y-6">
+          <div className="lg:col-span-4 space-y-6 no-print">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -456,7 +461,7 @@ export default function Home() {
 
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-2xl font-bold tracking-tight">Material Requirements & Cost</h2>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full no-print">
                     <DollarSign className="h-4 w-4" />
                     <span>Enter unit prices to calculate total</span>
                   </div>
@@ -557,14 +562,22 @@ export default function Home() {
                   
                   <Separator className="my-4 bg-primary/10" />
                   
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3 no-print">
                     <Button 
                       onClick={downloadCSV} 
                       className="flex-1 flex items-center gap-2" 
                       variant="outline"
                     >
                       <Download className="h-4 w-4" />
-                      Download CSV Estimate
+                      Download CSV
+                    </Button>
+                    <Button 
+                      onClick={handlePrint} 
+                      className="flex-1 flex items-center gap-2" 
+                      variant="outline"
+                    >
+                      <Printer className="h-4 w-4" />
+                      Print / PDF
                     </Button>
                     <Button 
                       onClick={shareResults} 
@@ -593,7 +606,7 @@ export default function Home() {
         </div>
       </main>
       
-      <footer className="relative z-10 border-t bg-card/50 py-6 text-center text-sm text-muted-foreground">
+      <footer className="relative z-10 border-t bg-card/50 py-6 text-center text-sm text-muted-foreground no-print">
         <p>Built by pros for pros. Questions? Hit us up at <a href="https://www.ddtruecraftsmen.com" target="_blank" rel="noopener noreferrer" className="font-semibold text-foreground hover:underline hover:text-primary transition-colors">D&D True Craftsmen</a>.</p>
       </footer>
     </div>

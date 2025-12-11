@@ -118,6 +118,27 @@
   }
 }
 
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .bg-card {
+    background: transparent !important;
+    border: 1px solid #ddd !important;
+  }
+  /* Hide background patterns */
+  div[style*="background-image"] {
+    background-image: none !important;
+  }
+}
+
 /* Custom Utilities for Blueprint effect */
 .bg-blueprint {
   background-image: 

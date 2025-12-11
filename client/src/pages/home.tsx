@@ -41,11 +41,16 @@ function HomeCalculatorIcon({ className }: { className?: string }) {
       className={className}
     >
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      <rect x="8" y="13" width="8" height="6" rx="1" />
-      <path d="M10 15h.01" />
-      <path d="M14 15h.01" />
-      <path d="M10 17h.01" />
-      <path d="M14 17h.01" />
+      {/* Plus */}
+      <path d="M7 13h2" />
+      <path d="M8 12v2" />
+      {/* Minus */}
+      <path d="M15 13h2" />
+      {/* Multiply */}
+      <path d="M7 17l2 2" />
+      <path d="M9 17l-2 2" />
+      {/* Divide */}
+      <path d="M15 19l2 -2" />
     </svg>
   )
 }

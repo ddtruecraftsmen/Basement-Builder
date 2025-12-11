@@ -39,6 +39,7 @@ export default function Home() {
     flooringSqFt: number;
     paintGallons: number;
     insulationRolls: number;
+    insulationBatts: number;
   } | null>(null);
 
   const form = useForm<FormValues>({
@@ -80,6 +81,8 @@ export default function Home() {
     // Easier calc: Wall Area - (Stud Area). Roughly just Wall Area sq ft.
     // Rolls usually cover ~40-50 sq ft (R13 Kraft Faced 15" x 32').
     const insulationRolls = Math.ceil(wallArea / 40);
+    // Batts usually sold in bags covering ~40-50 sq ft as well
+    const insulationBatts = Math.ceil(wallArea / 40);
 
     setResults({
       perimeter,
@@ -90,7 +93,8 @@ export default function Home() {
       drywallSheets,
       flooringSqFt,
       paintGallons,
-      insulationRolls
+      insulationRolls,
+      insulationBatts
     });
   }
 
@@ -265,6 +269,7 @@ export default function Home() {
                     items={[
                       { label: "4x8 Drywall Sheets", value: results.drywallSheets, unit: "sheets" },
                       { label: "R13 Insulation Rolls", value: results.insulationRolls, unit: "rolls" },
+                      { label: "R13 Insulation Batts", value: results.insulationBatts, unit: "bags" },
                     ]}
                   />
 

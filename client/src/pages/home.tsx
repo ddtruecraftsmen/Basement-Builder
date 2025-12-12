@@ -230,7 +230,7 @@ export default function Home() {
   const shareResults = async () => {
     if (!results) return;
     
-    const text = `Check out my basement reno calc: ${results.studs} studs, $${totalCost.toFixed(2)} est. total for a ${form.getValues().length}x${form.getValues().width} room! Built by D&D True Craftsmen.`;
+    const text = `RenoCalc Pro: ${results.studs} studs + full list for ${form.getValues().length}x${form.getValues().width} basement = ~$${Math.round(totalCost)}. Free tool from D&D True Craftsmen!`;
     
     if (navigator.share) {
       try {
@@ -244,7 +244,7 @@ export default function Home() {
       }
     } else {
       navigator.clipboard.writeText(text + ' ' + window.location.href)
-        .then(() => alert('Copied to clipboard!'));
+        .then(() => alert('Link copied—fire it off!'));
     }
   };
 
@@ -553,7 +553,7 @@ export default function Home() {
                       <p className="text-sm text-muted-foreground">Based on provided unit prices</p>
                     </div>
                     <div className="text-4xl font-mono font-bold text-primary">
-                      ${totalCost.toFixed(2)}
+                      ${Math.round(totalCost)}
                     </div>
                   </div>
                   
@@ -666,7 +666,7 @@ function MaterialCard({ icon: Icon, title, color, items, prices, onPriceChange, 
                   />
                 </div>
                 <div className="text-xs font-mono text-muted-foreground w-16 text-right font-bold">
-                  {enabledItems[item.priceKey] ? `$${((prices[item.priceKey] || 0) * item.value).toFixed(2)}` : '$0.00'}
+                  {enabledItems[item.priceKey] ? `$${Math.round((prices[item.priceKey] || 0) * item.value)}` : '$0'}
                 </div>
               </div>
             </div>

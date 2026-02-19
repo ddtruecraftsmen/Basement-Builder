@@ -15,21 +15,33 @@ export const BLOG_POSTS: Record<string, BlogPost> = {
   // COPY AND PASTE THIS BLOCK FOR EACH NEW ARTICLE
   "1": {
     id: "1",
-    title: "Your Article Title Here",
-    excerpt: "A short summary of your article that appears on the main blog page.",
+    title: "Train Creativity",
+    excerpt: "How to create the spark of creativity in any home project.",
     // PASTE YOUR HTML CONTENT INSIDE THE BACKTICKS BELOW (`...`)
     content: `
-      <p>Paste your article HTML here.</p>
+      <h3>Train Creativity</h3>
       
-      <h3>Section Heading</h3>
-      <p>More content...</p>
+      <p>The term, "Dream Job" and phrase, "It's not work if you're passionate about it" get tossed around so much that I fear it's crippling some people's sense of personal value when it comes to a career choice. I have had many different jobs over the years.</p>
+
+      <p>Ice Cream Shop, Coffee shop, Shipper/Receiver, Stock Room clerk, Customer Service Rep, Landscaper, Fine artist at a Studio, Bonsai Tree Designer, Freelance Illustrator, Apprentice Carpenter, Licensed Carpenter, Contractor/Owner.</p>
+
+      <p>I didn't apply for any of these jobs based on Passion. I also didn't leave any of them because of Passion either. I excelled at each and every job I was given. Not at first. At first I was usually indifferent to every job. I would always reach a point in each new job where I would come to the realization that either I quit, or double down and learn. Learn how to do the best job I could. Learn how to keep getting better. I would always have to remind myself that learning while working not only helps the time go by, but tricks your mind to change from "I could care less" to "get the job done."</p>
+
+      <p>There is a lot of merit to "tricking your mind". I think you can trick your mind into being passionate about your job. I also feel that you can train your employees to trick their own minds into being passionate about their job too. You trick them by setting goals, and allowing them to learn to solve the problem through your teaching or their own research. Once they can mentally see the finish line and the end product they can see how what they are doing isn't just a small task. It's part of a larger picture.</p>
       
-      <img src="/your-image-filename.jpg" alt="Description" />
+      <p>Once you start building the passion for the task at hand and knowing the end goal they will start to crave the learning experience. Knowing they are building an arsenal of knowledge they can leverage in future projects.</p>
+      
+      <p>You can't expect your employees to just have passion. You have to lead by example. Don't hold them back from learning as much as they can at work and on their own time. Don't treat them as just another pair of hands. Focus on their learning ability. Both physical and mental. Give them a task that they have to learn on their own and you will see the passion start to grow.</p>
+      
+      <p>The mind trick that leads to passion is learning. So set the goals and let your employees be part of something bigger than the individual tasks. Make your job site have a learning environment and you won't regret it. They won't either.</p>
+      
+      <p><strong>Devon Bowman</strong><br/>
+      Owner, D&D True Craftsmen</p>
     `,
     date: "Feb 19, 2026",
     readTime: "5 min read",
-    author: "Your Name",
-    category: "Category Name",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1200" // Replace with your image path (e.g. "/my-image.jpg")
+    author: "Devon Bowman",
+    category: "Career & Mindset",
+    image: "/Train Creativity.jpg" // Replace with your image path (e.g. "/my-image.jpg")
   }
 };

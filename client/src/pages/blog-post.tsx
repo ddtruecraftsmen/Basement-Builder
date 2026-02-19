@@ -45,7 +45,7 @@ export default function BlogPost() {
 
           <div 
             className="text-foreground leading-relaxed space-y-4 [&>h3]:text-xl [&>h3]:font-bold [&>h3]:text-primary [&>h3]:mt-8 [&>h3]:mb-2"
-            dangerouslySetInnerHTML={{ __html: post.content }} 
+            dangerouslySetInnerHTML={{ __html: post.content || "" }} 
           />
         </article>
 

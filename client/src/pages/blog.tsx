@@ -4,52 +4,11 @@ import { Button } from "@/components/ui/button";
 import { CalendarDays, Clock, User, ArrowRight, BookOpen } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Link } from "wouter";
-
-// Mock Data
-const BLOG_POSTS = [
-  {
-    id: 1,
-    title: "5 Common Basement Renovation Mistakes",
-    excerpt: "Avoid these costly errors when planning your basement finish. From moisture control to lighting layout, here's what the pros know.",
-    date: "Feb 15, 2026",
-    readTime: "5 min read",
-    author: "Dave (Master Carpenter)",
-    category: "Planning",
-    image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    id: 2,
-    title: "Drywall vs. Plaster: What's Best for Basements?",
-    excerpt: "Understanding the differences between standard drywall, moisture-resistant green board, and traditional plaster for below-grade applications.",
-    date: "Feb 10, 2026",
-    readTime: "4 min read",
-    author: "Sarah (Interior Design)",
-    category: "Materials",
-    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    id: 3,
-    title: "Understanding R-Value: Insulation 101",
-    excerpt: "Why R13 might not be enough for your climate zone. A comprehensive guide to fiberglass batts, rigid foam, and spray foam options.",
-    date: "Jan 28, 2026",
-    readTime: "7 min read",
-    author: "Mike (Energy Specialist)",
-    category: "Insulation",
-    image: "https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    id: 4,
-    title: "Flooring Options for Concrete Subfloors",
-    excerpt: "LVP, Laminate, or Carpet? We rank the top flooring choices for durability, moisture resistance, and warmth underfoot.",
-    date: "Jan 15, 2026",
-    readTime: "6 min read",
-    author: "Dave (Master Carpenter)",
-    category: "Flooring",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800"
-  }
-];
+import { BLOG_POSTS } from "@/data/blog-posts";
 
 export default function Blog() {
+  const posts = Object.values(BLOG_POSTS);
+
   return (
     <div className="min-h-screen bg-background font-sans text-foreground flex flex-col">
       <Header />
@@ -64,7 +23,7 @@ export default function Blog() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {BLOG_POSTS.map((post) => (
+          {posts.map((post) => (
             <Card key={post.id} className="flex flex-col overflow-hidden hover:shadow-lg transition-shadow border-muted">
               <div className="h-48 overflow-hidden relative">
                 <img 

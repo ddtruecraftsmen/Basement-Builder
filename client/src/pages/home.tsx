@@ -64,24 +64,7 @@ type MaterialPrice = {
   primerGallons: number;
 };
 
-function HomeCalculatorIcon({ className }: { className?: string }) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      {/* Square Root */}
-      <path d="M7 15l3 3l5 -7h4" />
-    </svg>
-  )
-}
+import { Header } from "@/components/layout/header";
 
 export default function Home() {
   const [results, setResults] = useState<CalculationResults | null>(null);
@@ -285,23 +268,7 @@ export default function Home() {
       {/* Background Pattern - Removed for cleaner look */}
       <div className="absolute inset-0 bg-background z-0" />
       
-      {/* Header */}
-      <header className="relative z-10 border-b bg-card shadow-sm sticky top-0 no-print">
-        <div className="container mx-auto px-4 py-6 flex items-center justify-between">
-          <div className="flex flex-col items-center mx-auto sm:mx-0 sm:items-start sm:flex-row sm:gap-4">
-            <div className="bg-primary p-2 rounded-md mb-2 sm:mb-0">
-              <HomeCalculatorIcon className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <div className="text-center sm:text-left">
-              <h1 className="text-2xl font-bold tracking-tight text-primary">RenoCalc Pro</h1>
-              <p className="text-xs text-muted-foreground tracking-wider uppercase">Basement Renovation Material Estimator</p>
-            </div>
-          </div>
-          <div className="hidden sm:block text-right">
-             <div className="text-xs text-muted-foreground font-mono">V1.0.0</div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="relative z-10 container mx-auto px-4 py-8 md:py-12 flex-grow">
         <div className="grid lg:grid-cols-12 gap-8 items-start">

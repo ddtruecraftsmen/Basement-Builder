@@ -57,6 +57,20 @@ D&D True Craftsmen</p>
     readTime: "5 min read",
     author: "Devon Bowman",
     category: "Category Name",
-    image: "Train Creativity.jpg" // Replace with your image path (e.g. "/my-image.jpg")
+    image: "/Train Creativity.jpg" // Replace with your image path (e.g. "/my-image.jpg")
+  },
+  "2": {
+    id: "2",
+    title: "Article 2 Title Here",
+    excerpt: "Short summary of article 2.",
+    // PASTE YOUR HTML CONTENT INSIDE THE BACKTICKS BELOW (`...`)
+    content: `
+      <p>Paste your second article HTML here.</p>
+    `,
+    date: "Feb 20, 2026",
+    readTime: "5 min read",
+    author: "Devon Bowman",
+    category: "Category Name",
+    image: "/your-second-image.jpg" 
   }
 };

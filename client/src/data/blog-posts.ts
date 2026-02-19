@@ -72,5 +72,96 @@ D&D True Craftsmen</p>
     author: "Devon Bowman",
     category: "Category Name",
     image: "/your-second-image.jpg" 
+  },
+  "3": {
+    id: "3",
+    title: "Article 3 Title",
+    excerpt: "Summary for article 3...",
+    content: `
+      <p>Paste HTML for article 3 here.</p>
+    `,
+    date: "Feb 21, 2026",
+    readTime: "5 min read",
+    author: "Devon Bowman",
+    category: "Category Name",
+    image: "/your-third-image.jpg" 
+  },
+  "4": {
+    id: "4",
+    title: "Article 4 Title",
+    excerpt: "Summary for article 4...",
+    content: `
+      <p>Paste HTML for article 4 here.</p>
+    `,
+    date: "Feb 22, 2026",
+    readTime: "5 min read",
+    author: "Devon Bowman",
+    category: "Category Name",
+    image: "/your-fourth-image.jpg" 
+  },
+  "5": {
+    id: "5",
+    title: "Article 5 Title",
+    excerpt: "Summary for article 5...",
+    content: `
+      <p>Paste HTML for article 5 here.</p>
+    `,
+    date: "Feb 23, 2026",
+    readTime: "5 min read",
+    author: "Devon Bowman",
+    category: "Category Name",
+    image: "/your-fifth-image.jpg" 
+  },
+  "6": {
+    id: "6",
+    title: "Article 6 Title",
+    excerpt: "Summary for article 6...",
+    content: `
+      <p>Paste HTML for article 6 here.</p>
+    `,
+    date: "Feb 24, 2026",
+    readTime: "5 min read",
+    author: "Devon Bowman",
+    category: "Category Name",
+    image: "/your-sixth-image.jpg" 
+  },
+  "7": {
+    id: "7",
+    title: "Article 7 Title",
+    excerpt: "Summary for article 7...",
+    content: `
+      <p>Paste HTML for article 7 here.</p>
+    `,
+    date: "Feb 25, 2026",
+    readTime: "5 min read",
+    author: "Devon Bowman",
+    category: "Category Name",
+    image: "/your-seventh-image.jpg" 
+  },
+  "8": {
+    id: "8",
+    title: "Article 8 Title",
+    excerpt: "Summary for article 8...",
+    content: `
+      <p>Paste HTML for article 8 here.</p>
+    `,
+    date: "Feb 26, 2026",
+    readTime: "5 min read",
+    author: "Devon Bowman",
+    category: "Category Name",
+    image: "/your-eighth-image.jpg" 
+  },
+  "9": {
+    id: "9",
+    title: "Article 9 Title",
+    excerpt: "Summary for article 9...",
+    content: `
+      <p>Paste HTML for article 9 here.</p>
+    `,
+    date: "Feb 27, 2026",
+    readTime: "5 min read",
+    author: "Devon Bowman",
+    category: "Category Name",
+    image: "/your-ninth-image.jpg" 
   }
 };
